@@ -48,10 +48,10 @@ The `book` object represents a physical piece of literature.
 
 Attribute | Value | Description
 ------------ | ------------- | -------------
-uid | Int | Unique identifier 
+uid | Int | auto-generated unique identifier 
 title | String | Name or title of the book
 author | String | Name(s) of book's author(s)
 publisher | String | Name of company the book was published under
-publish_date | Date | Date the book was published
+publish_date | uint64 | Date the book was published (uint64 Unix timestamp)
 rating | Int | Numeric rating of book (min: 1, max: 3)
 status | Int | Book's status code within the library (0: CheckedIn, 1: CheckedOut)
