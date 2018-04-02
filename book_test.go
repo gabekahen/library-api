@@ -8,10 +8,11 @@ import (
 
 var (
 	book = Book{
+		UID:         "12345",
 		Title:       "My Book",
 		Author:      "Mr. Author",
 		Publisher:   "Mr. Publisher",
-		PublishDate: time.Now().Unix(),
+		PublishDate: time.Now(),
 		Rating:      4,
 		Status:      0,
 	}
@@ -39,7 +40,6 @@ func TestRead(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(newBook)
 	if newBook.Title != "My Book" {
 		t.Fatalf("Book.Print(): Expected Title 'My Book', got '%v'", newBook.Title)
 	}
@@ -50,4 +50,24 @@ func TestDelete(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestNewBook(t *testing.T) {
+	bookString := []byte(`{"Title": "NewBook Tester"}`)
+
+	book, err := NewBook(bookString)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(book.UID) < 1 {
+		t.Fatalf("No UID Present")
+	}
+
+	_, err = NewBook(bookString)
+	if err == nil {
+		t.Fatal("Expected error on duplicate write, but got none")
+	}
+
+	book.delete()
 }
