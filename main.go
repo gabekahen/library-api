@@ -28,11 +28,23 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, fmt.Sprintf(`{"UID": "%s"}`, book.UID))
 }
 
+// Handler deletes books from storage
+// TODO: better error handling
 func libraryDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	book := Book{
+		UID: r.URL.Path[len(`/delete/`):],
+	}
 
+	err := book.delete()
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func main() {
 	http.HandleFunc("/create", libraryCreateHandler)
+	http.HandleFunc("/delete/", libraryDeleteHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
