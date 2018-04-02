@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
+	"io/ioutil"
 	"os"
 )
 
@@ -40,6 +41,20 @@ func (book *Book) write() error {
 	defer file.Close()
 
 	_, err = file.Write(book.print())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (book *Book) read(uid string) error {
+	content, err := ioutil.ReadFile(LibraryPath + uid)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(content, &book)
 	if err != nil {
 		return err
 	}
