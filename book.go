@@ -1,20 +1,26 @@
 package main
 
 import (
-  "encoding/json"
+	"encoding/json"
 )
+
+var (
+	// LibraryPath - temp directory for book storage
+	LibraryPath = "/Users/gabekahen/Documents/library"
+)
+
 // Book structure
 type Book struct {
-  UID uint64
-  Title string
-  Author string
-  Publisher string
-  PublishDate uint64
-  Rating int
-  Status int
+	UID         uint64
+	Title       string
+	Author      string
+	Publisher   string
+	PublishDate uint64
+	Rating      int
+	Status      int
 }
 
 func (book *Book) print() []byte {
-  output, _ := json.Marshal(book)
-  return output
+	output, _ := json.Marshal(book)
+	return output
 }
