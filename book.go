@@ -24,11 +24,13 @@ type Book struct {
 	Status      int
 }
 
+// returns a JSON-encoded book object
 func (book *Book) print() []byte {
 	output, _ := json.Marshal(book)
 	return output
 }
 
+// writes the book object to storage
 func (book *Book) write() error {
 	hasher := sha1.New()
 	hasher.Write([]byte(book.Title + book.Author + book.Publisher))
@@ -48,6 +50,7 @@ func (book *Book) write() error {
 	return nil
 }
 
+// reads the book object from storage
 func (book *Book) read() error {
 	content, err := ioutil.ReadFile(LibraryPath + book.UID)
 	if err != nil {
@@ -62,6 +65,7 @@ func (book *Book) read() error {
 	return nil
 }
 
+// Removes the book object from storage
 func (book *Book) delete() error {
 	err := os.Remove(LibraryPath + book.UID)
 	if err != nil {
