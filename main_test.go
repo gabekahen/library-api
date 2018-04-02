@@ -73,3 +73,57 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+// Tests the /read/ endpoint
+func TestLibraryRead(t *testing.T) {
+	bookData := map[string][]string{
+		"Title": []string{"test read endpoint"},
+	}
+
+	// create new book object
+	book, err := NewBook(bookData)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// write new book to storage for reading
+	err = book.write()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	read_req, err := http.NewRequest("GET", `/read/r_PJOOOqUjZ6SCCTVnywIiuaRS8=`, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handlerRead := http.HandlerFunc(libraryReadHandler)
+
+	handlerRead.ServeHTTP(rr, read_req)
+
+	// Check the status code is what we expect.
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	// Check the response body is what we expect.
+	expected := `{"UID":"r_PJOOOqUjZ6SCCTVnywIiuaRS8=","Title":"test read endpoint","Author":"","Publisher":"","PublishDate":"0001-01-01T00:00:00Z","Rating":0,"Status":0}`
+	if rr.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+	}
+
+	// cleanup test book
+	book.delete()
+
+	// test read on missing book
+	rr = httptest.NewRecorder()
+	handlerRead.ServeHTTP(rr, read_req)
+
+	if status := rr.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+}
