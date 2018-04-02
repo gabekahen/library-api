@@ -43,19 +43,19 @@ func NewBook(data map[string][]string) (*Book, error) {
 		case `PublishDate`:
 			i, err := strconv.ParseInt(value[0], 10, 64)
 			if err != nil {
-				return nil, fmt.Errorf("NewBook: Invalid UNIX date: %s\n", value[0])
+				return nil, fmt.Errorf("NewBook: Invalid UNIX date: %s", value[0])
 			}
 			book.PublishDate = time.Unix(i, 0).UTC()
 		case `Rating`:
 			i, err := strconv.ParseInt(value[0], 10, 0)
 			if err != nil {
-				return nil, fmt.Errorf("NewBook: Invalid Rating: %s\n", value[0])
+				return nil, fmt.Errorf("NewBook: Invalid Rating: %s", value[0])
 			}
 			book.Rating = int(i)
 		case `Status`:
 			i, err := strconv.ParseInt(value[0], 10, 0)
 			if err != nil {
-				return nil, fmt.Errorf("NewBook: Invalid Status: %s\n", value[0])
+				return nil, fmt.Errorf("NewBook: Invalid Status: %s", value[0])
 			}
 			book.Status = int(i)
 		}
