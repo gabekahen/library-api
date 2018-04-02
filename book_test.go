@@ -6,18 +6,8 @@ import (
 	"time"
 )
 
-func TestPrint(t *testing.T) {
-	var outBook Book
-	title := "My Book"
-	inBook := Book{Title: title}
-	json.Unmarshal(inBook.print(), &outBook)
-	if outBook.Title != title {
-		t.Fatalf("Book.Print(): Expected Title 'My Book', got '%v'", outBook.Title)
-	}
-}
-
-func TestWrite(t *testing.T) {
-	book := Book{
+var (
+	book = Book{
 		Title:       "My Book",
 		Author:      "Mr. Author",
 		Publisher:   "Mr. Publisher",
@@ -25,8 +15,32 @@ func TestWrite(t *testing.T) {
 		Rating:      4,
 		Status:      0,
 	}
+)
+
+func TestPrint(t *testing.T) {
+	var outBook Book
+	json.Unmarshal(book.print(), &outBook)
+	if outBook.Title != "My Book" {
+		t.Fatalf("Book.Print(): Expected Title 'My Book', got '%v'", outBook.Title)
+	}
+}
+
+func TestWrite(t *testing.T) {
 	err := book.write()
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestRead(t *testing.T) {
+	var newBook Book
+
+	err := newBook.read(book.UID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(newBook)
+	if newBook.Title != "My Book" {
+		t.Fatalf("Book.Print(): Expected Title 'My Book', got '%v'", newBook.Title)
 	}
 }
