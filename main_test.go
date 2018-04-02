@@ -9,13 +9,13 @@ import (
 func TestLibraryCreateAndDelete(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
-	create_req, err := http.NewRequest("GET", `/create?Title=API test create`, nil)
+	createReq, err := http.NewRequest("GET", `/create?Title=API test create`, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Create a delete request to pass to the delete handler
-	delete_req, err := http.NewRequest("GET", `/delete/LLJvMjsQPn0t79mIhOvLjPkbjTw=`, nil)
+	deleteReq, err := http.NewRequest("GET", `/delete/LLJvMjsQPn0t79mIhOvLjPkbjTw=`, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -26,7 +26,7 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 	handlerDelete := http.HandlerFunc(libraryDeleteHandler)
 
 	// Serve the create request to the response recorder
-	handlerCreate.ServeHTTP(rr, create_req)
+	handlerCreate.ServeHTTP(rr, createReq)
 
 	// Check the status code is what we expect.
 	if status := rr.Code; status != http.StatusCreated {
@@ -44,7 +44,7 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 	// Serve the same request again to the response recorder.
 	// This will attempt to create a duplicate book in storage.
 	rr = httptest.NewRecorder()
-	handlerCreate.ServeHTTP(rr, create_req)
+	handlerCreate.ServeHTTP(rr, createReq)
 
 	// Check the status code is what we expect.
 	if status := rr.Code; status != http.StatusConflict {
@@ -54,7 +54,7 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 
 	// Reset the response recorder (rr), and attempt to delete the new book object.
 	rr = httptest.NewRecorder()
-	handlerDelete.ServeHTTP(rr, delete_req)
+	handlerDelete.ServeHTTP(rr, deleteReq)
 
 	// Check the status code is what we expect.
 	if status := rr.Code; status != http.StatusOK {
@@ -65,7 +65,7 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 	// Reset the response recorder (rr), and attempt to delete the
 	// already deleted book object. Should return a HTTP 500
 	rr = httptest.NewRecorder()
-	handlerDelete.ServeHTTP(rr, delete_req)
+	handlerDelete.ServeHTTP(rr, deleteReq)
 
 	// Check the status code is what we expect.
 	if status := rr.Code; status != http.StatusInternalServerError {
@@ -92,7 +92,7 @@ func TestLibraryRead(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	read_req, err := http.NewRequest("GET", `/read/r_PJOOOqUjZ6SCCTVnywIiuaRS8=`, nil)
+	readReq, err := http.NewRequest("GET", `/read/r_PJOOOqUjZ6SCCTVnywIiuaRS8=`, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +100,7 @@ func TestLibraryRead(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handlerRead := http.HandlerFunc(libraryReadHandler)
 
-	handlerRead.ServeHTTP(rr, read_req)
+	handlerRead.ServeHTTP(rr, readReq)
 
 	// Check the status code is what we expect.
 	if status := rr.Code; status != http.StatusOK {
@@ -120,7 +120,7 @@ func TestLibraryRead(t *testing.T) {
 
 	// test read on missing book
 	rr = httptest.NewRecorder()
-	handlerRead.ServeHTTP(rr, read_req)
+	handlerRead.ServeHTTP(rr, readReq)
 
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
