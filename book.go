@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 )
 
 var (
@@ -15,7 +16,7 @@ type Book struct {
 	Title       string
 	Author      string
 	Publisher   string
-	PublishDate uint64
+	PublishDate int64
 	Rating      int
 	Status      int
 }
@@ -23,4 +24,18 @@ type Book struct {
 func (book *Book) print() []byte {
 	output, _ := json.Marshal(book)
 	return output
+}
+
+func (book *Book) write() error {
+	file, err := os.Create(LibraryPath + book.Title)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(book.print())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
