@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+// HTTP handler creates new book records.
+// Book attributes (Title, Publisher, Rating, etc) are passed as URI arguments
 func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	book, err := NewBook(r.URL.Query())
 	if err != nil {
@@ -36,7 +38,9 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, fmt.Sprintf(`{"UID": "%s"}`, book.UID))
 }
 
-// Handler deletes books from storage
+// Handler deletes books from storage.
+// /delete/<UID>
+// Throws errors if the book is cannot be deleted.
 // TODO: better error handling
 func libraryDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	book := Book{

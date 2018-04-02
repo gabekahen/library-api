@@ -96,7 +96,8 @@ func (book *Book) write() error {
 	return nil
 }
 
-// reads the book object from storage
+// reads the book object from storage.
+// Throws errors if object does not exist or is inaccessible.
 func (book *Book) read() error {
 	content, err := ioutil.ReadFile(LibraryPath + book.UID)
 	if err != nil {
