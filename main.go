@@ -16,9 +16,17 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if book.exist() {
-		err := fmt.Errorf("ERROR creating book - Book already exists in storage: %s", book.UID)
+		err = fmt.Errorf("ERROR creating book - Book already exists in storage: %s", book.UID)
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusConflict)
+		return
+	}
+
+	err = book.write()
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	// If the book was created successfully, return the book's UID
