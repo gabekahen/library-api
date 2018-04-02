@@ -48,8 +48,8 @@ func (book *Book) write() error {
 	return nil
 }
 
-func (book *Book) read(uid string) error {
-	content, err := ioutil.ReadFile(LibraryPath + uid)
+func (book *Book) read() error {
+	content, err := ioutil.ReadFile(LibraryPath + book.UID)
 	if err != nil {
 		return err
 	}

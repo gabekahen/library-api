@@ -33,9 +33,9 @@ func TestWrite(t *testing.T) {
 }
 
 func TestRead(t *testing.T) {
-	var newBook Book
+	newBook := Book{UID: book.UID}
 
-	err := newBook.read(book.UID)
+	err := newBook.read()
 	if err != nil {
 		t.Fatal(err)
 	}
