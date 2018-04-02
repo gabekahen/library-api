@@ -61,3 +61,12 @@ func (book *Book) read() error {
 
 	return nil
 }
+
+func (book *Book) delete() error {
+	err := os.Remove(LibraryPath + book.UID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

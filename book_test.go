@@ -44,3 +44,10 @@ func TestRead(t *testing.T) {
 		t.Fatalf("Book.Print(): Expected Title 'My Book', got '%v'", newBook.Title)
 	}
 }
+
+func TestDelete(t *testing.T) {
+	err := book.delete()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
