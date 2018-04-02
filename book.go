@@ -4,8 +4,10 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 var (
@@ -19,9 +21,33 @@ type Book struct {
 	Title       string
 	Author      string
 	Publisher   string
-	PublishDate int64
+	PublishDate time.Time
 	Rating      int
 	Status      int
+}
+
+// NewBook creates a new book given a valid JSON []byte slice.
+// Returns an error if JSON is not valid, or if book already exists in storage.
+func NewBook(data []byte) (*Book, error) {
+	book := Book{}
+	err := json.Unmarshal(data, &book)
+	if err != nil {
+		return nil, err
+	}
+
+	book.genuid()
+
+	err = book.read()
+	if err == nil {
+		return nil, fmt.Errorf("Book already present: %s", book.UID)
+	}
+
+	err = book.write()
+	if err != nil {
+		return nil, fmt.Errorf("Could not write book to storage: %s", book.UID)
+	}
+
+	return &book, nil
 }
 
 // returns a JSON-encoded book object
@@ -30,13 +56,17 @@ func (book *Book) print() []byte {
 	return output
 }
 
-// writes the book object to storage
-func (book *Book) write() error {
+// generates UID for book object
+func (book *Book) genuid() {
 	hasher := sha1.New()
 	hasher.Write([]byte(book.Title + book.Author + book.Publisher))
 	uid := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 	book.UID = uid
-	file, err := os.Create(LibraryPath + uid)
+}
+
+// writes the book object to storage
+func (book *Book) write() error {
+	file, err := os.Create(LibraryPath + book.UID)
 	if err != nil {
 		return err
 	}
