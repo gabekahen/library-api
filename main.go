@@ -1,21 +1,63 @@
 package main
 
 import (
+	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
-	// A very simple health check.
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
+	book := Book{}
 
-	// In the future we could report back on the status of our DB, or our cache
-	// (e.g. Redis) by performing a simple PING, and include them in the response.
-	io.WriteString(w, `{"alive": true}`)
+	for key, value := range r.URL.Query() {
+		switch key {
+		case `Title`:
+			book.Title = value[0]
+		case `Author`:
+			book.Author = value[0]
+		case `Publisher`:
+			book.Publisher = value[0]
+		case `PublishDate`:
+			i, err := strconv.ParseInt(value[0], 10, 64)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				log.Printf("Invalid UNIX date: %s\n", value[0])
+				return
+			}
+			book.PublishDate = time.Unix(i, 0).UTC()
+		case `Rating`:
+			i, err := strconv.ParseInt(value[0], 10, 0)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				log.Printf("Invalid Rating: %s\n", value[0])
+				return
+			}
+			book.Rating = int(i)
+		case `Status`:
+			i, err := strconv.ParseInt(value[0], 10, 0)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				log.Printf("Invalid Status: %s\n", value[0])
+				return
+			}
+			book.Status = int(i)
+		}
+	}
+
+	err := book.write()
+	if err != nil {
+		log.Printf("Error writing book: %s\n", err)
+	}
+
+	// w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	io.WriteString(w, fmt.Sprintf(`{"UID": "%s"}`, book.UID))
 }
 
 func main() {
-	// http.HandleFunc("/create", handler)
-	// log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/create", libraryCreateHandler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

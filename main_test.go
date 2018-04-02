@@ -1,11 +1,6 @@
 package main
 
-import (
-  "net/http"
-  "net/http/httptest"
-  "testing"
-)
-
+/*
 func TestLibraryCreateHandler(t *testing.T) {
     // Create a request to pass to our handler. We don't have any query parameters for now, so we'll
     // pass 'nil' as the third parameter.
@@ -35,3 +30,4 @@ func TestLibraryCreateHandler(t *testing.T) {
             rr.Body.String(), expected)
     }
 }
+*/
