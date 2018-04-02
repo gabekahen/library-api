@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -28,23 +29,48 @@ type Book struct {
 
 // NewBook creates a new book given a valid JSON []byte slice.
 // Returns an error if JSON is not valid, or if book already exists in storage.
-func NewBook(data []byte) (*Book, error) {
+func NewBook(data map[string][]string) (*Book, error) {
 	book := Book{}
-	err := json.Unmarshal(data, &book)
-	if err != nil {
-		return nil, err
+
+	for key, value := range data {
+		switch key {
+		case `Title`:
+			book.Title = value[0]
+		case `Author`:
+			book.Author = value[0]
+		case `Publisher`:
+			book.Publisher = value[0]
+		case `PublishDate`:
+			i, err := strconv.ParseInt(value[0], 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("NewBook: Invalid UNIX date: %s\n", value[0])
+			}
+			book.PublishDate = time.Unix(i, 0).UTC()
+		case `Rating`:
+			i, err := strconv.ParseInt(value[0], 10, 0)
+			if err != nil {
+				return nil, fmt.Errorf("NewBook: Invalid Rating: %s\n", value[0])
+			}
+			book.Rating = int(i)
+		case `Status`:
+			i, err := strconv.ParseInt(value[0], 10, 0)
+			if err != nil {
+				return nil, fmt.Errorf("NewBook: Invalid Status: %s\n", value[0])
+			}
+			book.Status = int(i)
+		}
 	}
 
 	book.genuid()
 
-	err = book.read()
+	err := book.read()
 	if err == nil {
-		return nil, fmt.Errorf("Book already present: %s", book.UID)
+		return nil, fmt.Errorf("NewBook: Book already present: %s", book.UID)
 	}
 
 	err = book.write()
 	if err != nil {
-		return nil, fmt.Errorf("Could not write book to storage: %s", book.UID)
+		return nil, fmt.Errorf("NewBook: Could not write book to storage: %s", book.UID)
 	}
 
 	return &book, nil

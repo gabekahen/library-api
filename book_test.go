@@ -52,8 +52,18 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+// TestNewBook tests the NewBook constructor. It should be able to create and
+// write a new Book object to storage, but should return an error if the object
+// already exists in storage.
 func TestNewBook(t *testing.T) {
-	bookString := []byte(`{"Title": "NewBook Tester"}`)
+	bookString := map[string][]string{
+		"Title":       []string{"NewBook Tester"},
+		"Author":      []string{"NewBook Author"},
+		"Publisher":   []string{"NewBook Publisher"},
+		"PublishDate": []string{"00000000"},
+		"Rating":      []string{"3"},
+		"Status":      []string{"0"},
+	}
 
 	book, err := NewBook(bookString)
 	if err != nil {
