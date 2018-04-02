@@ -73,11 +73,21 @@ func TestNewBook(t *testing.T) {
 	if len(book.UID) < 1 {
 		t.Fatalf("No UID Present")
 	}
+}
 
-	_, err = NewBook(bookString)
-	if err == nil {
-		t.Fatal("Expected error on duplicate write, but got none")
+func TestBookExist(t *testing.T) {
+	err := book.write()
+	if err != nil {
+		t.Fatalf("Error writing book: %s", err)
+	}
+
+	if book.exist() == false {
+		t.Fatalf("Book was written, but exist() returned false")
 	}
 
 	book.delete()
+
+	if book.exist() == true {
+		t.Fatalf("Book was delted, but exist() returned true")
+	}
 }

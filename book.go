@@ -28,7 +28,7 @@ type Book struct {
 }
 
 // NewBook creates a new book given a valid JSON []byte slice.
-// Returns an error if JSON is not valid, or if book already exists in storage.
+// Performs some basic validation on input data
 func NewBook(data map[string][]string) (*Book, error) {
 	book := Book{}
 
@@ -62,16 +62,6 @@ func NewBook(data map[string][]string) (*Book, error) {
 	}
 
 	book.genuid()
-
-	err := book.read()
-	if err == nil {
-		return nil, fmt.Errorf("NewBook: Book already present: %s", book.UID)
-	}
-
-	err = book.write()
-	if err != nil {
-		return nil, fmt.Errorf("NewBook: Could not write book to storage: %s", book.UID)
-	}
 
 	return &book, nil
 }
@@ -129,4 +119,13 @@ func (book *Book) delete() error {
 	}
 
 	return nil
+}
+
+// Helper function checks for presence of book in storage
+func (book *Book) exist() bool {
+	_, err := os.Stat(LibraryPath + book.UID)
+	if err == nil {
+		return true
+	}
+	return false
 }
