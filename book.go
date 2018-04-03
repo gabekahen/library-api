@@ -1,11 +1,10 @@
 package main
 
 import (
-	"crypto/sha1"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -74,10 +73,14 @@ func (book *Book) print() []byte {
 
 // generates UID for book object
 func (book *Book) genuid() {
-	hasher := sha1.New()
-	hasher.Write([]byte(book.Title + book.Author + book.Publisher))
-	uid := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
-	book.UID = uid
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+	uid := make([]byte, 32)
+
+	for i := range uid {
+		uid[i] = charset[seededRand.Intn(len(charset))]
+	}
+	book.UID = string(uid)
 }
 
 // writes the book object to storage
