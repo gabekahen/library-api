@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -85,16 +86,18 @@ func (book *Book) genuid() {
 
 // writes the book object to storage
 func (book *Book) write() error {
-	file, err := os.Create(LibraryPath + book.UID)
+	db, err := sql.Open("mysql", getDataSource()+"library_api")
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
-	_, err = file.Write(book.print())
-	if err != nil {
-		return err
-	}
+	result, err := db.Exec(
+		`INSERT INTO library (title, author, publisher, publishdate, rating, status)
+		VALUES ($1, $2, $3, $4, $5, $6)`,
+		book.Title, book.Author, book.Publisher, book.PublishDate, book.Rating, book.Status,
+	)
+
+	fmt.Print(result)
 
 	return nil
 }
