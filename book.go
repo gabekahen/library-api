@@ -98,8 +98,7 @@ func (book *Book) create() (int64, error) {
 	// use the library_api database
 	db.Exec(`USE library_api`)
 
-	// if UID
-
+	// Create a row in the 'books' table using values from the book() type
 	result, err := db.Exec(
 		"INSERT INTO books (title, author, publisher, publishdate, rating, status) VALUES (?, ?, ?, FROM_UNIXTIME(?), ?, ?)",
 		book.Title,
