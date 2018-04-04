@@ -13,6 +13,7 @@ func TestMain(m *testing.M) {
 	os.Setenv("LIBRARYAPI_DB_PASS", "")
 	os.Setenv("LIBRARYAPI_DB_PROT", "tcp")
 	os.Setenv("LIBRARYAPI_DB_HOST", "localhost:3306")
+	os.Exit(m.Run())
 }
 
 func TestLibraryCreateAndDelete(t *testing.T) {
