@@ -39,7 +39,7 @@ func initSchema() error {
 
 	// Setup the table schema for books
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS books (
-			id MEDIUMINT NOT NULL AUTO_INCREMENT,
+			uid MEDIUMINT NOT NULL AUTO_INCREMENT,
 			title VARCHAR(140) NOT NULL,
 			author VARCHAR(60) NOT NULL,
 			publisher VARCHAR(60),
