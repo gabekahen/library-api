@@ -5,8 +5,8 @@ import (
 )
 
 func TestInitSchema(t *testing.T) {
-	_, err := initSchema()
+	err := initSchema()
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 }

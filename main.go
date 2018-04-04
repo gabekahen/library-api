@@ -81,6 +81,11 @@ func libraryDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	err := initSchema()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	http.HandleFunc("/create", libraryCreateHandler)
 	http.HandleFunc("/read/", libraryReadHandler)
 	http.HandleFunc("/delete/", libraryDeleteHandler)
