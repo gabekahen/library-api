@@ -84,7 +84,7 @@ func TestLibraryRead(t *testing.T) {
 	}
 
 	// write new book to storage for reading
-	err = book.write()
+	_, err = book.create()
 	if err != nil {
 		t.Error(err)
 	}

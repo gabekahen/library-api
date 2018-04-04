@@ -84,22 +84,43 @@ func (book *Book) genuid() {
 	book.UID = string(uid)
 }
 
-// writes the book object to storage
-func (book *Book) write() error {
-	db, err := sql.Open("mysql", getDataSource()+"library_api")
+// create write a new book object to the database. It returns the UID of the
+// object, and any errors returned by the database. If an error is returned,
+// create() returns int64(0) with the error.
+func (book *Book) create() (int64, error) {
+	db, err := sql.Open("mysql", getDataSource())
 	if err != nil {
-		return err
+		return 0, err
 	}
 
+	defer db.Close()
+
+	// use the library_api database
+	db.Exec(`USE library_api`)
+
+	// if UID
+
 	result, err := db.Exec(
-		`INSERT INTO library (title, author, publisher, publishdate, rating, status)
-		VALUES ($1, $2, $3, $4, $5, $6)`,
-		book.Title, book.Author, book.Publisher, book.PublishDate, book.Rating, book.Status,
+		"INSERT INTO books (title, author, publisher, publishdate, rating, status) VALUES (?, ?, ?, FROM_UNIXTIME(?), ?, ?)",
+		book.Title,
+		book.Author,
+		book.Publisher,
+		book.PublishDate.Unix(),
+		book.Rating,
+		book.Status,
 	)
 
-	fmt.Print(result)
+	if err != nil {
+		return 0, err
+	}
 
-	return nil
+	// Grab the UID from the last insert ID
+	uid, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return uid, nil
 }
 
 // reads the book object from storage.

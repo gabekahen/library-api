@@ -24,7 +24,7 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = book.write()
+	uid, err := book.create()
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -32,7 +32,7 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the book was created successfully, return the book's UID
-	log.Printf("Created new book: %s", book.UID)
+	log.Printf("Created new book: %d", uid)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	io.WriteString(w, fmt.Sprintf(`{"UID": "%s"}`, book.UID))
