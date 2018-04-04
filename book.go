@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -61,8 +60,6 @@ func NewBook(data map[string][]string) (*Book, error) {
 		}
 	}
 
-	book.genuid()
-
 	return &book, nil
 }
 
@@ -70,18 +67,6 @@ func NewBook(data map[string][]string) (*Book, error) {
 func (book *Book) print() []byte {
 	output, _ := json.Marshal(book)
 	return output
-}
-
-// generates UID for book object
-func (book *Book) genuid() {
-	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
-	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-	uid := make([]byte, 32)
-
-	for i := range uid {
-		uid[i] = charset[seededRand.Intn(len(charset))]
-	}
-	book.UID = string(uid)
 }
 
 // create write a new book object to the database. It returns the UID of the
