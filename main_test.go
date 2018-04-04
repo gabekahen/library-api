@@ -4,15 +4,23 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
+
+func TestMain(m *testing.M) {
+	os.Setenv("LIBRARYAPI_DB_USER", "root")
+	os.Setenv("LIBRARYAPI_DB_PASS", "")
+	os.Setenv("LIBRARYAPI_DB_PROT", "tcp")
+	os.Setenv("LIBRARYAPI_DB_HOST", "localhost:3306")
+}
 
 func TestLibraryCreateAndDelete(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
 	createReq, err := http.NewRequest("GET", `/create?Title=API test create`, nil)
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
@@ -35,7 +43,7 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 
 	deleteReq, err := http.NewRequest("GET", `/delete/`+responseBook.UID, nil)
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	handlerDelete := http.HandlerFunc(libraryDeleteHandler)
@@ -71,18 +79,18 @@ func TestLibraryRead(t *testing.T) {
 	// create new book object
 	book, err := NewBook(bookData)
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	// write new book to storage for reading
 	err = book.write()
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	readReq, err := http.NewRequest("GET", `/read/`+book.UID, nil)
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	rr := httptest.NewRecorder()
