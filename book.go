@@ -123,14 +123,10 @@ func (book *Book) read() error {
 	return nil
 }
 
-// Removes the book object from storage
-func (book *Book) delete() error {
-	err := os.Remove(LibraryPath + book.UID)
-	if err != nil {
-		return err
-	}
+// Deletes the book from the database. Returns the UID of the deleted book, and
+// any errors encountered. If an error occurs, the UID returned is 0.
+func (book *Book) delete() (int64, error) {
 
-	return nil
 }
 
 // Helper function checks for presence of book in storage
