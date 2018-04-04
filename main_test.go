@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
 	"testing"
 )
 
@@ -19,7 +20,7 @@ func TestMain(m *testing.M) {
 func TestLibraryCreateAndDelete(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
-	createReq, err := http.NewRequest("GET", `/create?Title=API test create`, nil)
+	createReq, err := http.NewRequest("GET", `/create?Title=TestLibraryCreateAndDelete&Author=Mr. Author`, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -42,7 +43,7 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 	responseBook := Book{}
 	json.Unmarshal(rr.Body.Bytes(), &responseBook)
 
-	deleteReq, err := http.NewRequest("GET", `/delete/`+responseBook.UID, nil)
+	deleteReq, err := http.NewRequest("GET", `/delete/`+strconv.FormatInt(responseBook.UID, 10), nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -74,7 +75,12 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 // Tests the /read/ endpoint
 func TestLibraryRead(t *testing.T) {
 	bookData := map[string][]string{
-		"Title": []string{"test read endpoint"},
+		"Title":       []string{"test read endpoint"},
+		"Author":      []string{"Author Authington"},
+		"Publisher":   []string{"Mr. Publisher"},
+		"PublishDate": []string{"1522863678"},
+		"Rating":      []string{"5"},
+		"Status":      []string{"0"},
 	}
 
 	// create new book object
@@ -89,7 +95,8 @@ func TestLibraryRead(t *testing.T) {
 		t.Error(err)
 	}
 
-	readReq, err := http.NewRequest("GET", `/read/`+book.UID, nil)
+	uidString := strconv.FormatInt(book.UID, 10)
+	readReq, err := http.NewRequest("GET", `/read/`+uidString, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -106,7 +113,7 @@ func TestLibraryRead(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	expected := `{"UID":"` + book.UID + `","Title":"test read endpoint","Author":"","Publisher":"","PublishDate":"0001-01-01T00:00:00Z","Rating":0,"Status":0}`
+	expected := `{"UID":"` + strconv.FormatInt(book.UID, 10) + `","Title":"test read endpoint","Author":"","Publisher":"","PublishDate":"0001-01-01T00:00:00Z","Rating":0,"Status":0}`
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			rr.Body.String(), expected)
