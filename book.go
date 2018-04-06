@@ -7,11 +7,6 @@ import (
 	"time"
 )
 
-var (
-	// LibraryPath - temp directory for book storage
-	LibraryPath = "/Users/gabekahen/Documents/library/"
-)
-
 // Book structure
 type Book struct {
 	UID         int
