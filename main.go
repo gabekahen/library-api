@@ -140,11 +140,27 @@ func libraryDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		UID: int(uid),
 	}
 
+	err = book.read()
+	if err != nil {
+		log.Printf("libraryDeleteHandler: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	err = book.delete()
 	if err != nil {
 		log.Printf("libraryDeleteHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	// If the book was created successfully, return the book's UID
+	log.Printf("Delete request for book %d", book.UID)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(book.print())
+	if err != nil {
+		log.Printf("libraryReadHandler: %s", err)
 	}
 }
 
@@ -156,6 +172,8 @@ func main() {
 
 	http.HandleFunc("/create", libraryCreateHandler)
 	http.HandleFunc("/read/", libraryReadHandler)
+	http.HandleFunc("/update", libraryUpdateHandler)
 	http.HandleFunc("/delete/", libraryDeleteHandler)
+	log.Print("Starting server on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
