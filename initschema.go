@@ -69,7 +69,7 @@ func dbConnect() (*sql.DB, error) {
 	}
 
 	// use the library_api database
-	_, err := db.Exec(`USE library_api`)
+	_, err = db.Exec(`USE library_api`)
 	if err != nil {
 		return nil, err
 	}
