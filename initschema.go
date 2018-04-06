@@ -42,10 +42,10 @@ func initSchema() error {
 			uid MEDIUMINT NOT NULL AUTO_INCREMENT,
 			title VARCHAR(140) NOT NULL,
 			author VARCHAR(60) NOT NULL,
-			publisher VARCHAR(60),
-			publishdate DATETIME,
-			rating TINYINT,
-			status TINYINT,
+			publisher VARCHAR(60) NOT NULL,
+			publishdate DATETIME NOT NULL,
+			rating TINYINT NOT NULL,
+			status TINYINT NOT NULL,
 			PRIMARY KEY (uid),
 			UNIQUE KEY (title, author, publisher)
 		)`)
