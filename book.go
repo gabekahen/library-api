@@ -132,6 +132,25 @@ func (book *Book) read() error {
 	return nil
 }
 
+// update commits changes to a Book object's status or rating.
+// Returns an error on failure.
+func (book *Book) update() error {
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(
+		`UPDATE books SET rating = ?, status = ? WHERE uid = ?`,
+		book.Rating, book.Status, book.UID,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Removes the book object from the database. Returns an error on failure.
 func (book *Book) delete() error {
 	db, err := dbConnect()
