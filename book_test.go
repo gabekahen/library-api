@@ -32,7 +32,7 @@ func TestPrint(t *testing.T) {
 	}
 }
 
-func TestWrite(t *testing.T) {
+func TestCreate(t *testing.T) {
 	testWriteBook := book
 	testWriteBook.Title = "TestWriteBook"
 
@@ -42,6 +42,15 @@ func TestWrite(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
+	})
+	t.Run("Create book TestWrite2 with same author, publisher", func(t *testing.T) {
+		testWriteBook2 := testWriteBook
+		testWriteBook2.Title = "TestWriteBook2"
+		err := testWriteBook2.create()
+		if err != nil {
+			t.Error(err)
+		}
+		testWriteBook2.delete()
 	})
 	t.Run("Fail on duplicate book TestWrite", func(t *testing.T) {
 		err := testWriteBook.create()
@@ -90,6 +99,46 @@ func TestDelete(t *testing.T) {
 			t.Errorf("No error received on deleting missing book %d", book.UID)
 		}
 	})
+}
+
+// test the update method for the Book struct
+func TestUpdate(t *testing.T) {
+	testUpdateBook := book
+	testUpdateBook.Title = "testUpdateBook"
+
+	err := testUpdateBook.create()
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Run("Test update Rating", func(t *testing.T) {
+		testBook := testUpdateBook
+		testBook.Title = "testUpdateTitle"
+		testBook.Rating = 1 // previously set to 4, above
+
+		err := testBook.update()
+		if err != nil {
+			t.Error(err)
+		}
+
+		newBook := Book{UID: testBook.UID}
+		newBook.read()
+		if newBook.Rating != testBook.Rating {
+			t.Errorf("Expected rating '%d', but got '%d'", testBook.Rating, newBook.Rating)
+		}
+	})
+
+	t.Run("Commit the same update multiple times", func(t *testing.T) {
+		testBook := testUpdateBook
+		testBook.Status = 1
+		for i := 0; i < 5; i++ {
+			err := testBook.update()
+			if err != nil {
+				t.Error(err)
+			}
+		}
+	})
+	testUpdateBook.delete()
 }
 
 // TestNewBook tests the NewBook constructor. It should be able to create and
