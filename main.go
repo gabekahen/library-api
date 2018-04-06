@@ -64,6 +64,66 @@ func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// HTTP handler updates status, rating for existing book records.
+// /update?UID=<int>&rating=<int>&status=<int>
+// Throws an error if the book cannot be found / accessed from storage.
+func libraryUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	uid, err := strconv.Atoi(r.URL.Query().Get(`UID`))
+	if err != nil {
+		log.Printf("libraryUpdateHandler: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	book := Book{UID: uid}
+	// Get the current values for the given UID
+	err = book.read()
+	if err != nil {
+		log.Printf("libraryUpdateHandler: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	rating := r.URL.Query().Get(`Rating`)
+	status := r.URL.Query().Get(`Status`)
+
+	if rating != "" {
+		i, err := strconv.Atoi(rating)
+		if err != nil {
+			log.Printf("libraryUpdateHandler: %s", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		book.Rating = i
+	}
+	if status != "" {
+		i, err := strconv.Atoi(status)
+		if err != nil {
+			log.Printf("libraryUpdateHandler: %s", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		book.Status = i
+
+	}
+
+	err = book.update()
+	if err != nil {
+		log.Printf("libraryUpdateHandler: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// If the book was created successfully, return the book's UID
+	log.Printf("Update request for book %d", book.UID)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(book.print())
+	if err != nil {
+		log.Printf("libraryReadHandler: %s", err)
+	}
+}
+
 // Handler deletes books from storage.
 // /delete/<UID>
 // Throws errors if the book is cannot be deleted.
