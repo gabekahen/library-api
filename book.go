@@ -25,6 +25,12 @@ func NewBook(data map[string][]string) (*Book, error) {
 
 	for key, value := range data {
 		switch key {
+		case `UID`:
+			i, err := strconv.ParseInt(value[0], 10, 0)
+			if err != nil {
+				return nil, fmt.Errorf("NewBook: Invalid UID: %s", value[0])
+			}
+			book.UID = int(i)
 		case `Title`:
 			book.Title = value[0]
 		case `Author`:
