@@ -51,3 +51,5 @@ publisher | String | Name of company the book was published under
 publish_date | time.Time | Date the book was published (Golang time library)
 rating | Int | Numeric rating of book (min: 1, max: 3)
 status | Int | Book's status code within the library (0: CheckedIn, 1: CheckedOut)
+
+TODO: Bulk object CRUD?
