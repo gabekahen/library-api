@@ -149,8 +149,3 @@ func (book *Book) delete() error {
 	}
 	return nil
 }
-
-// Helper function checks for presence of book in storage
-func (book *Book) exist() bool {
-	return false
-}
