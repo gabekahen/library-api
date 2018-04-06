@@ -55,14 +55,24 @@ func initSchema() error {
 	return nil
 }
 
-func connectDB() (*sql.DB, error) {
+// dbConnect is a helper function that returns a *sql.DB object used to
+// issue database queries.
+func dbConnect() (*sql.DB, error) {
 	db, err := sql.Open("mysql", getDataSource())
 	if err != nil {
 		return nil, err
 	}
 
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
 	// use the library_api database
-	db.Exec(`USE library_api`)
+	_, err := db.Exec(`USE library_api`)
+	if err != nil {
+		return nil, err
+	}
 
 	return db, nil
 }
