@@ -31,7 +31,11 @@ func TestMain(m *testing.M) {
 func TestLibraryCreateAndDelete(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
-	createReq, err := http.NewRequest("GET", `/create?Title=TestLibraryCreateAndDelete&Author=Mr. Author`, nil)
+	createReq, err := http.NewRequest(
+		"GET",
+		`/create?Title=TestLibraryCreateAndDelete&Author=Mr. Author&PublishDate=12345678`,
+		nil,
+	)
 	if err != nil {
 		t.Error(err)
 	}
@@ -46,7 +50,7 @@ func TestLibraryCreateAndDelete(t *testing.T) {
 	// Check the status code is what we expect.
 	if status := rr.Code; status != http.StatusCreated {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+			status, http.StatusCreated)
 	}
 
 	// Create a delete request to pass to the delete handler.
