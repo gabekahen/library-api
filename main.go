@@ -49,7 +49,7 @@ func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = book.read()
 	if err != nil {
-		log.Print(err)
+		log.Printf("libraryReadHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -60,7 +60,7 @@ func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(book.print())
 	if err != nil {
-		log.Print(err)
+		log.Printf("libraryReadHandler: %s", err)
 	}
 }
 
@@ -82,7 +82,7 @@ func libraryDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = book.delete()
 	if err != nil {
-		log.Print(err)
+		log.Printf("libraryDeleteHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
