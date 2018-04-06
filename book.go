@@ -102,6 +102,38 @@ func (book *Book) create() error {
 // reads the book object from storage.
 // Throws errors if object does not exist or is inaccessible.
 func (book *Book) read() error {
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+
+	row := db.QueryRow(
+		`SELECT
+			uid,
+			title,
+			author,
+			publisher,
+			publishdate,
+			rating,
+			status
+		FROM books
+		WHERE uid = ?`,
+		book.UID,
+	)
+
+	err = row.Scan(
+		&book.UID,
+		&book.Title,
+		&book.Author,
+		&book.Publisher,
+		&book.PublishDate,
+		&book.Rating,
+		&book.Status,
+	)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
