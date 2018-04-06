@@ -8,7 +8,7 @@ import (
 
 var (
 	book = Book{
-		Title:       "My Book",
+		Title:       "",
 		Author:      "Mr. Author",
 		Publisher:   "Mr. Publisher",
 		PublishDate: time.Now(),
@@ -19,14 +19,25 @@ var (
 
 func TestPrint(t *testing.T) {
 	var outBook Book
+
+	book.Title = "TestPrint"
 	json.Unmarshal(book.print(), &outBook)
-	if outBook.Title != "My Book" {
+	if outBook.Title != "TestPrint" {
 		t.Errorf("Book.Print(): Expected Title 'My Book', got '%v'", outBook.Title)
 	}
 }
 
 func TestWrite(t *testing.T) {
-	_, err := book.create()
+	book.Title = "TestWrite"
+	err := book.create()
+	t.Logf("Book UID: %d", book.UID)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestDelete(t *testing.T) {
+	err := book.delete()
 	if err != nil {
 		t.Error(err)
 	}
