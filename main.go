@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // HTTP handler creates new book records.
@@ -12,21 +13,21 @@ import (
 func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	book, err := NewBook(r.URL.Query())
 	if err != nil {
-		log.Print(err)
+		log.Printf("libraryCreateHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if book.exist() {
-		err = fmt.Errorf("ERROR creating book - Book already exists in storage: %s", book.UID)
-		log.Print(err)
+		err = fmt.Errorf("ERROR creating book - Book already exists in storage: %d", book.UID)
+		log.Printf("libraryCreateHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusConflict)
 		return
 	}
 
 	uid, err := book.create()
 	if err != nil {
-		log.Print(err)
+		log.Printf("libraryCreateHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -35,18 +36,25 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Created new book: %d", uid)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, fmt.Sprintf(`{"UID": "%s"}`, book.UID))
+	io.WriteString(w, fmt.Sprintf(`{"UID": "%d"}`, book.UID))
 }
 
 // HTTP handler reads existing book records.
 // /read/<UID>
 // Throws an error if the book cannot be found / accessed from storage.
 func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
-	book := Book{
-		UID: r.URL.Path[len(`/read/`):],
+	uid, err := strconv.ParseInt(r.URL.Path[len(`/read/`):], 10, 64)
+	if err != nil {
+		log.Printf("libraryReadHandler: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	err := book.read()
+	book := Book{
+		UID: uid,
+	}
+
+	err = book.read()
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -54,7 +62,7 @@ func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the book was created successfully, return the book's UID
-	log.Printf("Read request for book: %s", book.UID)
+	log.Printf("Read request for book: %d", book.UID)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(book.print())
@@ -68,11 +76,18 @@ func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
 // Throws errors if the book is cannot be deleted.
 // TODO: better error handling
 func libraryDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	book := Book{
-		UID: r.URL.Path[len(`/delete/`):],
+	uid, err := strconv.ParseInt(r.URL.Path[len(`/read/`):], 10, 64)
+	if err != nil {
+		log.Printf("libraryDeleteHandler: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	err := book.delete()
+	book := Book{
+		UID: uid,
+	}
+
+	err = book.delete()
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

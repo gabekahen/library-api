@@ -54,3 +54,15 @@ func initSchema() error {
 
 	return nil
 }
+
+func connectDB() (*sql.DB, error) {
+	db, err := sql.Open("mysql", getDataSource())
+	if err != nil {
+		return nil, err
+	}
+
+	// use the library_api database
+	db.Exec(`USE library_api`)
+
+	return db, nil
+}

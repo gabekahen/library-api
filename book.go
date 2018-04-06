@@ -1,11 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"strconv"
 	"time"
 )
@@ -17,7 +14,7 @@ var (
 
 // Book structure
 type Book struct {
-	UID         string
+	UID         int64
 	Title       string
 	Author      string
 	Publisher   string
@@ -73,17 +70,11 @@ func (book *Book) print() []byte {
 // object, and any errors returned by the database. If an error is returned,
 // create() returns int64(0) with the error.
 func (book *Book) create() (int64, error) {
-	db, err := sql.Open("mysql", getDataSource())
+	db, err := connectDB()
 	if err != nil {
 		return 0, err
 	}
 
-	defer db.Close()
-
-	// use the library_api database
-	db.Exec(`USE library_api`)
-
-	// Create a row in the 'books' table using values from the book() type
 	result, err := db.Exec(
 		"INSERT INTO books (title, author, publisher, publishdate, rating, status) VALUES (?, ?, ?, FROM_UNIXTIME(?), ?, ?)",
 		book.Title,
@@ -110,30 +101,33 @@ func (book *Book) create() (int64, error) {
 // reads the book object from storage.
 // Throws errors if object does not exist or is inaccessible.
 func (book *Book) read() error {
-	content, err := ioutil.ReadFile(LibraryPath + book.UID)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(content, &book)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
-// Deletes the book from the database. Returns the UID of the deleted book, and
-// any errors encountered. If an error occurs, the UID returned is 0.
-func (book *Book) delete() (int64, error) {
+// Removes the book object from the database. Returns an error on failure.
+func (book *Book) delete() error {
+	db, err := connectDB()
+	if err != nil {
+		return err
+	}
+
+	result, err := db.Exec(
+		`DELETE FROM books WHERE uid = ?`,
+		book.UID,
+	)
+	if err != nil {
+		return err
+	}
+
+	retUID, err := result.LastInsertId()
+
+	if retUID != book.UID {
+		return fmt.Errorf("delete() looking for UID '%d', but got '%d'", book.UID, retUID)
+	}
 
 }
 
 // Helper function checks for presence of book in storage
 func (book *Book) exist() bool {
-	_, err := os.Stat(LibraryPath + book.UID)
-	if err == nil {
-		return true
-	}
 	return false
 }
