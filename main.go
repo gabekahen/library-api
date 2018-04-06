@@ -18,14 +18,7 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if book.exist() {
-		err = fmt.Errorf("ERROR creating book - Book already exists in storage: %d", book.UID)
-		log.Printf("libraryCreateHandler: %s", err)
-		http.Error(w, err.Error(), http.StatusConflict)
-		return
-	}
-
-	uid, err := book.create()
+	err = book.create()
 	if err != nil {
 		log.Printf("libraryCreateHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -33,7 +26,7 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the book was created successfully, return the book's UID
-	log.Printf("Created new book: %d", uid)
+	log.Printf("Created new book: %d", book.UID)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	io.WriteString(w, fmt.Sprintf(`{"UID": "%d"}`, book.UID))
@@ -43,7 +36,7 @@ func libraryCreateHandler(w http.ResponseWriter, r *http.Request) {
 // /read/<UID>
 // Throws an error if the book cannot be found / accessed from storage.
 func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
-	uid, err := strconv.ParseInt(r.URL.Path[len(`/read/`):], 10, 64)
+	uid, err := strconv.ParseInt(r.URL.Path[len(`/read/`):], 10, 0)
 	if err != nil {
 		log.Printf("libraryReadHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -51,7 +44,7 @@ func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	book := Book{
-		UID: uid,
+		UID: int(uid),
 	}
 
 	err = book.read()
@@ -76,7 +69,7 @@ func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
 // Throws errors if the book is cannot be deleted.
 // TODO: better error handling
 func libraryDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	uid, err := strconv.ParseInt(r.URL.Path[len(`/read/`):], 10, 64)
+	uid, err := strconv.ParseInt(r.URL.Path[len(`/delete/`):], 10, 0)
 	if err != nil {
 		log.Printf("libraryDeleteHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -84,7 +77,7 @@ func libraryDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	book := Book{
-		UID: uid,
+		UID: int(uid),
 	}
 
 	err = book.delete()

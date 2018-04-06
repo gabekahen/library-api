@@ -14,7 +14,7 @@ var (
 
 // Book structure
 type Book struct {
-	UID         int64
+	UID         int
 	Title       string
 	Author      string
 	Publisher   string
@@ -66,13 +66,12 @@ func (book *Book) print() []byte {
 	return output
 }
 
-// create write a new book object to the database. It returns the UID of the
-// object, and any errors returned by the database. If an error is returned,
-// create() returns int64(0) with the error.
-func (book *Book) create() (int64, error) {
-	db, err := connectDB()
+// create write a new book object to the database. It returns
+// any errors returned by the database.
+func (book *Book) create() error {
+	db, err := dbConnect()
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	result, err := db.Exec(
@@ -86,16 +85,18 @@ func (book *Book) create() (int64, error) {
 	)
 
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	// Grab the UID from the last insert ID
 	uid, err := result.LastInsertId()
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return uid, nil
+	book.UID = int(uid)
+
+	return nil
 }
 
 // reads the book object from storage.
@@ -106,25 +107,20 @@ func (book *Book) read() error {
 
 // Removes the book object from the database. Returns an error on failure.
 func (book *Book) delete() error {
-	db, err := connectDB()
+	db, err := dbConnect()
 	if err != nil {
 		return err
 	}
 
-	result, err := db.Exec(
-		`DELETE FROM books WHERE uid = ?`,
-		book.UID,
-	)
+	response, err := db.Exec(`DELETE FROM books WHERE uid = ?`, book.UID)
 	if err != nil {
 		return err
 	}
 
-	retUID, err := result.LastInsertId()
-
-	if retUID != book.UID {
-		return fmt.Errorf("delete() looking for UID '%d', but got '%d'", book.UID, retUID)
+	if rows, _ := response.RowsAffected(); rows == 0 {
+		return fmt.Errorf("DELETE FAILED: Book not found: %d", book.UID)
 	}
-
+	return nil
 }
 
 // Helper function checks for presence of book in storage
