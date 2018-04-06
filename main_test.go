@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -14,6 +16,7 @@ func TestMain(m *testing.M) {
 	os.Setenv("LIBRARYAPI_DB_PASS", "")
 	os.Setenv("LIBRARYAPI_DB_PROT", "tcp")
 	os.Setenv("LIBRARYAPI_DB_HOST", "localhost:3306")
+	log.SetOutput(ioutil.Discard)
 	os.Exit(m.Run())
 }
 
