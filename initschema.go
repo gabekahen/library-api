@@ -47,7 +47,7 @@ func initSchema() error {
 			rating TINYINT,
 			status TINYINT,
 			PRIMARY KEY (uid),
-			UNIQUE KEY (title, author, publisher, publishdate)
+			UNIQUE KEY (title, author, publisher)
 		)`)
 	if err != nil {
 		return err
