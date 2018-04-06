@@ -29,15 +29,30 @@ func TestPrint(t *testing.T) {
 
 func TestWrite(t *testing.T) {
 	book.Title = "TestWrite"
-	err := book.create()
-	t.Logf("Book UID: %d", book.UID)
-	if err != nil {
-		t.Error(err)
-	}
+	t.Run("Create book TestWrite", func(t *testing.T) {
+		err := book.create()
+		t.Logf("Book UID: %d", book.UID)
+		if err != nil {
+			t.Error(err)
+		}
+	})
+	t.Run("Fail on duplicate book TestWrite", func(t *testing.T) {
+		err := book.create()
+		if err == nil {
+			t.Error("Expected failure on duplicate book, but got none")
+		}
+	})
+	book.delete()
 }
 
 func TestDelete(t *testing.T) {
-	err := book.delete()
+	book.Title = "TestDelete"
+	err := book.create()
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = book.delete()
 	if err != nil {
 		t.Error(err)
 	}
