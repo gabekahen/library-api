@@ -9,7 +9,7 @@ import (
 )
 
 func getDataSource() string {
-	return fmt.Sprintf("%s:%s@%s(%s)/",
+	return fmt.Sprintf("%s:%s@%s(%s)/?parseTime=true",
 		os.Getenv("LIBRARYAPI_DB_USER"),
 		os.Getenv("LIBRARYAPI_DB_PASS"),
 		os.Getenv("LIBRARYAPI_DB_PROT"),
