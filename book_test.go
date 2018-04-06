@@ -19,63 +19,77 @@ var (
 
 func TestPrint(t *testing.T) {
 	var outBook Book
+	testPrintBook := book
+	testPrintBook.Title = "TestPrint"
 
-	book.Title = "TestPrint"
-	json.Unmarshal(book.print(), &outBook)
-	if outBook.Title != "TestPrint" {
-		t.Errorf("Book.Print(): Expected Title 'My Book', got '%v'", outBook.Title)
+	json.Unmarshal(testPrintBook.print(), &outBook)
+	if outBook.Title != testPrintBook.Title {
+		t.Errorf(
+			"Book.Print(): Expected Title '%s', got '%s'",
+			testPrintBook.Title,
+			outBook.Title,
+		)
 	}
 }
 
 func TestWrite(t *testing.T) {
-	book.Title = "TestWrite"
+	testWriteBook := book
+	testWriteBook.Title = "TestWriteBook"
+
 	t.Run("Create book TestWrite", func(t *testing.T) {
-		err := book.create()
-		t.Logf("Book UID: %d", book.UID)
+		err := testWriteBook.create()
+		t.Logf("Book UID: %d", testWriteBook.UID)
 		if err != nil {
 			t.Error(err)
 		}
 	})
 	t.Run("Fail on duplicate book TestWrite", func(t *testing.T) {
-		err := book.create()
+		err := testWriteBook.create()
 		if err == nil {
 			t.Error("Expected failure on duplicate book, but got none")
 		}
 	})
-	book.delete()
+
+	testWriteBook.delete()
 }
 
-func TestDelete(t *testing.T) {
-	book.Title = "TestDelete"
-	err := book.create()
-	if err != nil {
-		t.Error(err)
-	}
-
-	err = book.delete()
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-/*
 func TestRead(t *testing.T) {
-	newBook := Book{UID: book.UID}
+	testReadBook := book
+	testReadBook.Title = "testReadBook"
 
-	err := newBook.read()
+	testReadBook.create()
+
+	newReadBook := Book{UID: testReadBook.UID}
+
+	err := newReadBook.read()
 	if err != nil {
 		t.Error(err)
 	}
-	if newBook.Title != "My Book" {
-		t.Errorf("Book.Print(): Expected Title 'My Book', got '%v'", newBook.Title)
+
+	if newReadBook.Title != testReadBook.Title {
+		t.Logf("%+v", newReadBook)
+		t.Errorf("Expected Publisher '%s', got '%s'", testReadBook.Publisher, newReadBook.Publisher)
 	}
+	newReadBook.delete()
 }
 
 func TestDelete(t *testing.T) {
-	err := book.delete()
-	if err != nil {
-		t.Error(err)
-	}
+	testDeleteBook := book
+	testDeleteBook.Title = "testDeleteBook"
+
+	testDeleteBook.create() // create the book to be deleted
+	t.Run("Delete book from TestWrite", func(t *testing.T) {
+		err := testDeleteBook.delete()
+		if err != nil {
+			t.Error(err)
+		}
+	})
+	t.Run("Fail to delete missing book", func(t *testing.T) {
+		err := testDeleteBook.delete()
+		if err == nil {
+			t.Errorf("No error received on deleting missing book %d", book.UID)
+		}
+	})
 }
 
 // TestNewBook tests the NewBook constructor. It should be able to create and
@@ -83,7 +97,7 @@ func TestDelete(t *testing.T) {
 // already exists in storage.
 func TestNewBook(t *testing.T) {
 	bookString := map[string][]string{
-		"Title":       []string{"NewBook Tester"},
+		"Title":       []string{"TestNewBook"},
 		"Author":      []string{"NewBook Author"},
 		"Publisher":   []string{"NewBook Publisher"},
 		"PublishDate": []string{"00000000"},
@@ -91,30 +105,25 @@ func TestNewBook(t *testing.T) {
 		"Status":      []string{"0"},
 	}
 
-	book, err := NewBook(bookString)
+	testNewBook, err := NewBook(bookString)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if len(book.UID) < 1 {
-		t.Errorf("No UID Present")
-	}
-}
-
-func TestBookExist(t *testing.T) {
-	err := book.create()
+	err = testNewBook.create()
 	if err != nil {
-		t.Errorf("Error writing book: %s", err)
+		t.Error(err)
 	}
 
-	if book.exist() == false {
-		t.Errorf("Book was written, but exist() returned false")
+	newBook := Book{UID: testNewBook.UID}
+	err = newBook.read()
+	if err != nil {
+		t.Error(err)
 	}
 
-	book.delete()
-
-	if book.exist() == true {
-		t.Errorf("Book was delted, but exist() returned true")
+	if newBook.Author != testNewBook.Author {
+		t.Logf("%+v", newBook)
+		t.Errorf("Expected author '%s', but got '%s'", testNewBook.Author, newBook.Author)
 	}
+	newBook.delete()
 }
-*/
