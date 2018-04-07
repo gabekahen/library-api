@@ -84,7 +84,7 @@ func libraryUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If the book was created successfully, return the book's UID
+	// If the book was created successfully, return the book object
 	log.Printf("Update request for book %d", book.UID)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
