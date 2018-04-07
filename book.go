@@ -23,6 +23,16 @@ type Book struct {
 func NewBook(data map[string][]string) (*Book, error) {
 	book := Book{}
 
+	// if UID exists, read book data before overwriting
+	if val, ok := data[`UID`]; ok {
+		uid, err := strconv.ParseInt(val[0], 10, 0)
+		if err != nil {
+			return nil, fmt.Errorf("NewBook: Invalid UID: %s", val[0])
+		}
+		book.UID = int(uid)
+		book.read()
+	}
+
 	for key, value := range data {
 		switch key {
 		case `Title`:

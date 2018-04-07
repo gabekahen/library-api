@@ -68,43 +68,11 @@ func libraryReadHandler(w http.ResponseWriter, r *http.Request) {
 // /update?UID=<int>&rating=<int>&status=<int>
 // Throws an error if the book cannot be found / accessed from storage.
 func libraryUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	uid, err := strconv.Atoi(r.URL.Query().Get(`UID`))
+	book, err := NewBook(r.URL.Query())
 	if err != nil {
-		log.Printf("libraryUpdateHandler: %s", err)
+		log.Printf("libraryCreateHandler: %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	}
-
-	book := Book{UID: uid}
-	// Get the current values for the given UID
-	err = book.read()
-	if err != nil {
-		log.Printf("libraryUpdateHandler: %s", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	rating := r.URL.Query().Get(`Rating`)
-	status := r.URL.Query().Get(`Status`)
-
-	if rating != "" {
-		i, err := strconv.Atoi(rating)
-		if err != nil {
-			log.Printf("libraryUpdateHandler: %s", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		book.Rating = i
-	}
-	if status != "" {
-		i, err := strconv.Atoi(status)
-		if err != nil {
-			log.Printf("libraryUpdateHandler: %s", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		book.Status = i
-
 	}
 
 	err = book.update()
