@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	_ "github.com/docker/go-healthcheck"
 )
 
 // HTTP handler creates new book records.
