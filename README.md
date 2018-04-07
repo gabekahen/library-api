@@ -138,5 +138,5 @@ CREATE TABLE IF NOT EXISTS books (
 * Data validation is poor, and mostly left up to MySQL
 * Error messages could be more verbose (SQL errors aren't always super insightful)
 * Testing coverage could be better (exceptions like passing words to UID or Rating are not tested in the interest of saving time, but should be there)
-* Database credentials _should_ be passed using Kubernetes Secrets, but are lazily included in the `library-api.yaml` manifest.
+* Database credentials _should_ be passed using Kubernetes Secrets, but are hard-coded in the `library-api.yaml` manifest.
 * Inefficient at scale (every book operation on every book object is a single SQL query).
