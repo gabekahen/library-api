@@ -1,4 +1,8 @@
-install : docker-alpine clean 
+install : setup docker-alpine clean
+
+setup:
+	go get github.com/docker/go-healthcheck
+	go get github.com/go-sql-driver/mysql
 
 docker-alpine:
 	GOOS=linux go build -o library_api
