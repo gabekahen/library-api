@@ -98,7 +98,7 @@ RESPONSE:
 ## /delete/
 The `/delete/` endpoint allows book objects to be removed from storage.
 
-The request URL should include the `UID` of the book to be deleted.
+The request URL must include the `UID` of the book to be deleted.
 
 EXAMPLE:
 
