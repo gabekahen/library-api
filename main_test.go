@@ -17,7 +17,6 @@ func TestMain(m *testing.M) {
 	os.Setenv("LIBRARYAPI_DB_PASS", "")
 	os.Setenv("LIBRARYAPI_DB_PROT", "tcp")
 	os.Setenv("LIBRARYAPI_DB_HOST", "localhost:3306")
-	log.SetOutput(ioutil.Discard)
 
 	// make sure the schema exists before we start our tests
 	err := initSchema()
@@ -25,6 +24,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
+	log.SetOutput(ioutil.Discard)
 	os.Exit(m.Run())
 }
 
